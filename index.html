@@ -11,6 +11,11 @@
   <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
   integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
   crossorigin=""></script>
+  <style>
+    #issMap {
+      height: 400px;
+    }
+  </style>
   <title>Where the ISS at?</title>
 </head>
 <body>
@@ -18,9 +23,26 @@
   <p>Latitude <span id="latitude"></span></p>
   <p>Longitude <span id="longitude"></span></p>
 
-  <div id="issMap" style="height: 180px"></div>
+  <div id="issMap"></div>
 
   <script>
+    const mymap = L.map('issMap').setView([0, 0], 1);
+    const issIcon = L.icon({
+      iconUrl: 'iss.png',
+      iconSize: [50, 32],
+      iconAnchor: [25, 16],
+      popupAnchor: [-3, -76],
+      shadowUrl: 'iss.png',
+      shadowSize: [68, 95],
+      shadowAnchor: [22, 94]
+    });
+    const marker = L.marker([0, 0]).addTo(mymap)
+
+    const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+    const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+    const tiles = L.tileLayer(tileUrl, { attribution })
+    tiles.addTo(mymap)
+
     const API_URL = 'https://api.wheretheiss.at/v1/satellites/25544'
 
     async function getISSCoordinates() {
@@ -31,12 +53,12 @@
       document.getElementById('latitude').innerHTML = latitude
       document.getElementById('longitude').innerHTML = longitude
 
-      console.log('data: ', data)
-      console.log('latitude: ', data.latitude)
-      console.log('longitude: ', data.longitude)
+      marker.setLatLng([latitude, longitude])
+      mymap.setView([latitude, longitude], 2)
     }
 
-    getISSCoordinates()
+    setInterval(getISSCoordinates, 2000)
+
   </script>
 </body>
 </html>
